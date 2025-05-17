@@ -33,7 +33,7 @@ type Notifier struct {
 }
 
 type Mathmaker struct {
-	URL string `yaml:"url" env-required:"true"`
+	BaseURL string `yaml:"url" env-required:"true"`
 }
 
 func MustLoad() *Config {

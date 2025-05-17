@@ -45,7 +45,7 @@ func main() {
 	logger.Debug("debug messages are enabled")
 
 	// mathmaker
-	mathmaker := mathmaker.New(cfg.Mathmaker.URL, logger)
+	mathmaker := mathmaker.New(cfg.Mathmaker.BaseURL, logger)
 
 	// go
 	g, gCtx := errgroup.WithContext(ctx)
