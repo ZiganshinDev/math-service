@@ -1,0 +1,45 @@
+before_script:
+  - echo "start job at :" `date`
+  - echo "workspace is:" `pwd`
+
+after_script:
+  - echo "done job at :" `date`
+
+stages:
+  - test
+  - build
+
+lint:
+  image: golangci/golangci-lint:v1.61.0-alpine
+  stage: test
+  script:
+    - golangci-lint run -v -c ./build/ci/.golangci.yml
+  artifacts:
+    expire_in: "10 min"
+    paths:
+      - gl-code-quality-report.json
+
+unit-tests:
+  stage: test
+  image: golang:1.22-alpine
+  script:
+   - ls && go test ./...
+
+coverage:
+  stage: test
+  image: golang:1.22-alpine
+  script:
+    - go test ./... -coverprofile cover.out
+  artifacts:
+    expire_in: "10 minutes"
+    paths:
+      - cover.out
+
+build:
+  stage: build
+  script:
+    - echo "Running my script"
+    - ls -la
+    - ssh -i /home/aziganshin/.ssh/id_ed25519 aziganshin@localhost "cd /home/aziganshin/workspace/go/src/sindromitis && cd ./deployments && docker compose down sindromitis && docker compose up migrate-up && docker compose up sindromitis"
+  only:
+    - main

@@ -1,0 +1,32 @@
+version: '3'
+name: sindromitis
+services:
+  sindromitis:
+    image: golang:1.22
+    entrypoint: bash -c "go install -buildvcs=false ./cmd/sindromitis && ./bin/sindromitis"
+    working_dir: /sindromitis
+    ports:
+      - 8085:8085
+    volumes:
+      - ..:/sindromitis
+    environment:
+      GOPATH: /sindromitis
+      GO111MODULE: auto
+      CONFIG_PATH: ./configs/local.yaml
+    
+  migrate-up:
+    image: jerray/goose:2.7.0-rc3
+    entrypoint: goose -dir=/migrations postgres postgres://postgres:postgres@postgres-dev:5432/postgres?sslmode=disable up
+    volumes:
+      - ../build/migrations:/migrations
+
+  migrate-down:
+    image: jerray/goose:2.7.0-rc3
+    entrypoint: goose -dir=/migrations postgres postgres://postgres:postgres@postgres-dev:5432/postgres?sslmode=disable down-to 0
+    volumes:
+      - ../build/migrations:/migrations
+
+networks:
+  default:
+    name: tat-network
+    external: true
