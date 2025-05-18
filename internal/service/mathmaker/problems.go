@@ -4,8 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
-	"net/http"
 
 	"mathbot/internal/models"
 
@@ -35,14 +33,8 @@ func (m *Mathmaker) Problem(ctx context.Context, id uuid.UUID) (models.Problem, 
 	const op = "mathmaker.problems.Problem"
 
 	url := fmt.Sprintf("%s/problem/%s", m.baseURL, id)
-	m.logger.Debugf("url", url)
 
-	resp, err := http.Get(url)
-	if err != nil {
-		return models.Problem{}, fmt.Errorf("%s: %w", op, err)
-	}
-	defer resp.Body.Close()
-	body, err := io.ReadAll(resp.Body)
+	body, err := m.Get(ctx, url)
 	if err != nil {
 		return models.Problem{}, fmt.Errorf("%s: %w", op, err)
 	}
@@ -60,14 +52,8 @@ func (m *Mathmaker) Problems(ctx context.Context) ([]models.Problem, error) {
 	const op = "mathmaker.problems.Problem"
 
 	url := fmt.Sprintf("%s/q/?query=&with_answer=1", m.baseURL)
-	m.logger.Debugf("url", url)
 
-	resp, err := http.Get(url)
-	if err != nil {
-		return nil, fmt.Errorf("%s: %w", op, err)
-	}
-	defer resp.Body.Close()
-	body, err := io.ReadAll(resp.Body)
+	body, err := m.Get(ctx, url)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
@@ -77,8 +63,6 @@ func (m *Mathmaker) Problems(ctx context.Context) ([]models.Problem, error) {
 	if err := json.Unmarshal(body, &mathProblems); err != nil {
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
-
-	fmt.Println("problems", mathProblems)
 
 	problems := make([]models.Problem, 0, len(mathProblems.Problems))
 	for _, mathProblem := range mathProblems.Problems {

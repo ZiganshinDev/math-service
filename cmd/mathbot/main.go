@@ -47,11 +47,11 @@ func main() {
 	logger.Debug("debug messages are enabled")
 
 	// mathmaker
-	mathmaker := mathmaker.New(cfg.Mathmaker.BaseURL, logger)
-	// _, err = mathmaker.Problems(ctx)
-	// if err != nil {
-	// 	fmt.Println("error", err)
-	// }
+	mathmaker := mathmaker.New(cfg.Mathmaker.BaseURL, cfg.Mathmaker.Timeout, logger)
+	_, err = mathmaker.Problems(ctx)
+	if err != nil {
+		fmt.Println("error", err)
+	}
 	res, err := mathmaker.Problem(ctx, uuid.MustParse("0a76cc73-ea95-4c9b-8b15-d1ee21de8aaa"))
 	if err != nil {
 		fmt.Println("error", err)

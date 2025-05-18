@@ -2,6 +2,7 @@ env: "local"
 
 mathmaker:
   base_url: https://mathmaker.ru
+  reqTimeout: 5s
 
 http_server:
   port: "8085"

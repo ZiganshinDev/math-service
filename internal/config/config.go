@@ -21,7 +21,8 @@ type HTTPServer struct {
 }
 
 type Mathmaker struct {
-	BaseURL string `yaml:"base_url" env-required:"true"`
+	BaseURL string        `yaml:"base_url" env-required:"true"`
+	Timeout time.Duration `yaml:"reqTimeout" env-default:"5s"`
 }
 
 func MustLoad() *Config {
