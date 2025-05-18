@@ -52,6 +52,8 @@ func (m *Mathmaker) Get(ctx context.Context, url string) ([]byte, error) {
 	m.logger.With("url", url).Debugf("response status: %d, headers: %v", resp.StatusCode, resp.Header)
 
 	if err := checkStatusCode(resp.StatusCode); err != nil {
+		body, _ := io.ReadAll(resp.Body)
+		m.logger.Debugf("response body: %s", body)
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
@@ -65,6 +67,7 @@ func (m *Mathmaker) Get(ctx context.Context, url string) ([]byte, error) {
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
+	m.logger.Debugf("response body length: %d bytes", len(body))
 	return body, nil
 }
 
