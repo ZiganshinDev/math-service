@@ -32,7 +32,7 @@ type Problem struct {
 func (m *Mathmaker) Problem(ctx context.Context, id uuid.UUID) (models.Problem, error) {
 	const op = "mathmaker.problems.Problem"
 
-	url := fmt.Sprintf("%s/problem/%s", m.baseURL, id)
+	url := fmt.Sprintf("%s/api/problems/%s", m.baseURL, id)
 
 	body, err := m.Get(ctx, url)
 	if err != nil {
@@ -51,7 +51,7 @@ func (m *Mathmaker) Problem(ctx context.Context, id uuid.UUID) (models.Problem, 
 func (m *Mathmaker) Problems(ctx context.Context) ([]models.Problem, error) {
 	const op = "mathmaker.problems.Problem"
 
-	url := fmt.Sprintf("%s/q/?query=&with_answer=1", m.baseURL)
+	url := fmt.Sprintf("%s/api/tree/default/search?page=1&with_answer=1", m.baseURL)
 
 	body, err := m.Get(ctx, url)
 	if err != nil {

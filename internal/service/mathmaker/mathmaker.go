@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 
 	"go.uber.org/zap"
@@ -28,18 +29,35 @@ func New(baseURL string, reqTimeout time.Duration, logger *zap.SugaredLogger) *M
 func (m *Mathmaker) Get(ctx context.Context, url string) ([]byte, error) {
 	const op = "mathmaker.mathmaker.Get"
 
-	m.logger.Debugf("url", url)
+	m.logger.Debugf("requesting URL: %s", url)
 
-	resp, err := m.client.Get(url)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", op, err)
+	}
+
+	header := http.Header{
+		"accept":          []string{"application/json"},
+		"accept-encoding": []string{"gzip", "deflate", "br", "zstd"},
+	}
+
+	req.Header = header
+
+	resp, err := m.client.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 	defer resp.Body.Close()
 
-	m.logger.With("url", url).Debugf("resp status code", resp.StatusCode)
+	m.logger.With("url", url).Debugf("response status: %d, headers: %v", resp.StatusCode, resp.Header)
 
 	if err := checkStatusCode(resp.StatusCode); err != nil {
 		return nil, fmt.Errorf("%s: %w", op, err)
+	}
+
+	contentType := resp.Header.Get("Content-Type")
+	if !strings.Contains(contentType, "application/json") {
+		m.logger.Warnf("unexpected content type: %s", contentType)
 	}
 
 	body, err := io.ReadAll(resp.Body)
