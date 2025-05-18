@@ -12,6 +12,9 @@ import (
 	"github.com/google/uuid"
 )
 
+type Problems struct {
+	Problems []Problem `json:"problems"`
+}
 type Problem struct {
 	ID        uuid.UUID `json:"id"`
 	Title     string    `json:"title"`
@@ -69,16 +72,16 @@ func (m *Mathmaker) Problems(ctx context.Context) ([]models.Problem, error) {
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
-	var mathProblems []Problem
+	var mathProblems Problems
 
 	if err := json.Unmarshal(body, &mathProblems); err != nil {
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
-	fmt.Println(mathProblems)
+	fmt.Println("problems", mathProblems)
 
-	problems := make([]models.Problem, 0, len(mathProblems))
-	for _, mathProblem := range mathProblems {
+	problems := make([]models.Problem, 0, len(mathProblems.Problems))
+	for _, mathProblem := range mathProblems.Problems {
 		problems = append(problems, mathProblemToModel(mathProblem))
 	}
 

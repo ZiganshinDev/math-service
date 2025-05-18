@@ -2,7 +2,7 @@ version: '3'
 name: mathbot
 services:
   mathbot:
-    image: golang:1.22
+    image: golang:1.23
     entrypoint: bash -c "go install -buildvcs=false ./cmd/mathbot && ./bin/mathbot"
     working_dir: /mathbot
     ports:
