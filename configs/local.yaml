@@ -1,25 +1,9 @@
 env: "local"
 
-notifier_queue: "notifier"
-
-TinkoffConfig:
-  AccountId: ""
-  APIToken: t.sGayBw-uVHBCPjn-3QHdvB4qDYv3EBfQMF31YtBCFUzMLJHARkjHOeO7ph8Cmy0hzhAhLvX53MW7z6X7zH_jTQ
-  EndPoint: sandbox-invest-public-api.tinkoff.ru:443
-  AppName: tinvest-local
-  DisableResourceExhaustedRetry: false
-  DisableAllRetry: false
-  MaxRetries: 0
+mathmaker:
+  base_url: https://mathmaker.ru/
 
 http_server:
   port: "8085"
   timeout: 4s
   idle_timeout: 30s
-
-grpc_server:
-  port: "8089"
-
-storage:
-  postgres_uri: postgres://postgres:postgres@postgres-dev:5432/postgres
-  redis_connection_string: redis://my_user:my_user_password@redis-dev:6379
-  amqp_url: amqp://guest:guest@rabbit-dev:5672/

@@ -46,6 +46,7 @@ func main() {
 
 	// mathmaker
 	mathmaker := mathmaker.New(cfg.Mathmaker.BaseURL, logger)
+	mathmaker.Problems(ctx)
 
 	// go
 	g, gCtx := errgroup.WithContext(ctx)
