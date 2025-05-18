@@ -1,5 +1,3 @@
-workdir = $(pwd)
-
 make up:
 	cd ./deployments && docker compose up mathbot
 
