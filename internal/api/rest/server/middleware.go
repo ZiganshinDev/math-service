@@ -22,7 +22,7 @@ func errorMiddleware(logger *zap.SugaredLogger) gin.HandlerFunc {
 			if !errors.As(ginErr.Err, &svcErr) {
 				logger.Error(ginErr.Err.Error())
 				c.JSON(http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
-				break
+				return
 			}
 
 			switch svcErr.BaseErr {
@@ -36,7 +36,7 @@ func errorMiddleware(logger *zap.SugaredLogger) gin.HandlerFunc {
 				return
 			}
 
-			c.JSON(statusCode, gin.H{"error": ginErr.Err.Error()})
+			c.JSON(statusCode, gin.H{"error": svcErr.Error()})
 		}
 	}
 }

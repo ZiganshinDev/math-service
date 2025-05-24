@@ -2,6 +2,7 @@ package svcerr
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 )
 
@@ -21,12 +22,12 @@ type SvcErr struct {
 	msgs       []string
 }
 
-func (s *SvcErr) Error() string {
-	return s.serviceErr.Error() + strings.Join(s.msgs, sepStr)
+func (e *SvcErr) Error() string {
+	return fmt.Sprintf("%s: %s", e.serviceErr.Error(), strings.Join(e.msgs, sepStr))
 }
 
-func (s *SvcErr) Unwrap() error {
-	return s.serviceErr
+func (e *SvcErr) Unwrap() error {
+	return e.serviceErr
 }
 
 func New(baseErr BaseErr, serviceErr error, msgs ...string) error {
