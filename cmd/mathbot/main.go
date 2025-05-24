@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"log/slog"
 	"os"
@@ -15,7 +14,6 @@ import (
 	"mathbot/internal/service/app"
 	"mathbot/internal/service/mathmaker"
 
-	"github.com/google/uuid"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"golang.org/x/sync/errgroup"
@@ -48,17 +46,6 @@ func main() {
 
 	// mathmaker
 	mathmaker := mathmaker.New(cfg.Mathmaker.BaseURL, cfg.Mathmaker.Timeout, logger)
-	res, err := mathmaker.Problems(ctx)
-	if err != nil {
-		fmt.Println("error", err)
-	}
-	fmt.Println(res)
-
-	r, err := mathmaker.Problem(ctx, uuid.MustParse("0a76cc73-ea95-4c9b-8b15-d1ee21de8aaa"))
-	if err != nil {
-		fmt.Println("error", err)
-	}
-	fmt.Println("res", r)
 
 	// go
 	g, gCtx := errgroup.WithContext(ctx)

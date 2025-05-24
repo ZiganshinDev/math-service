@@ -23,7 +23,19 @@ func (h *Handler) problems(c *gin.Context) {
 }
 
 func (h *Handler) problem(c *gin.Context) {
-	problem, err := h.app.Problem(c.Request.Context(), uuid.UUID{})
+	var req ProblemReq
+	if err := c.ShouldBindUri(&req); err != nil {
+		c.JSON(400, gin.H{"msg": err.Error()})
+		return
+	}
+
+	id, err := uuid.Parse(req.ID)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	problem, err := h.app.Problem(c.Request.Context(), id)
 	if err != nil {
 		c.Error(err)
 		return

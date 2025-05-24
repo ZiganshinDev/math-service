@@ -1,9 +1,10 @@
 package server
 
 import (
+	"errors"
 	"net/http"
 
-	"mathbot/internal/service/app"
+	"mathbot/internal/svcerr"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -14,13 +15,28 @@ func errorMiddleware(logger *zap.SugaredLogger) gin.HandlerFunc {
 		c.Next()
 
 		for _, ginErr := range c.Errors {
-			if code, ok := app.Is4xxError(ginErr.Err); ok {
-				c.JSON(code, gin.H{"error": ginErr.Err.Error()})
+			var svcErr *svcerr.SvcErr
+
+			var statusCode int
+
+			if !errors.As(ginErr.Err, &svcErr) {
+				logger.Error(ginErr.Err.Error())
+				c.JSON(http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
+				break
+			}
+
+			switch svcErr.BaseErr {
+			case svcerr.ErrBadReq:
+				statusCode = http.StatusBadRequest
+			case svcerr.ErrNotFound:
+				statusCode = http.StatusNotFound
+			default:
+				logger.Error(ginErr.Err.Error())
+				c.JSON(http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
 				return
 			}
 
-			logger.Error(ginErr.Err.Error())
-			c.JSON(http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
+			c.JSON(statusCode, gin.H{"error": ginErr.Err.Error()})
 		}
 	}
 }

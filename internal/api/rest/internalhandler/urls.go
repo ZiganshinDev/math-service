@@ -11,7 +11,7 @@ func (h *Handler) Urls() map[string]map[string]gin.HandlerFunc {
 		"/problems": {
 			http.MethodGet: h.problems,
 		},
-		"/problems/{id}": {
+		"/problems/:id": {
 			http.MethodGet: h.problem,
 		},
 	}
