@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"mathbot/internal/models"
+	"mathbot/internal/svcerr"
 
 	"github.com/google/uuid"
 )
@@ -39,10 +40,14 @@ func (m *Mathmaker) Problem(ctx context.Context, id uuid.UUID) (models.Problem, 
 		return models.Problem{}, fmt.Errorf("%s: %w", op, err)
 	}
 
+	if body == nil {
+		return models.Problem{}, nil
+	}
+
 	var mathProblem Problem
 
 	if err := json.Unmarshal(body, &mathProblem); err != nil {
-		return models.Problem{}, fmt.Errorf("%s: %w", op, err)
+		return models.Problem{}, fmt.Errorf("%s: %w", op, svcerr.New(svcerr.ErrInternal, err))
 	}
 
 	return mathProblemToModel(mathProblem), nil
@@ -58,10 +63,14 @@ func (m *Mathmaker) Problems(ctx context.Context) ([]models.Problem, error) {
 		return nil, fmt.Errorf("%s: %w", op, err)
 	}
 
+	if body == nil {
+		return nil, nil
+	}
+
 	var mathProblems Problems
 
 	if err := json.Unmarshal(body, &mathProblems); err != nil {
-		return nil, fmt.Errorf("%s: %w", op, err)
+		return nil, fmt.Errorf("%s: %w", op, svcerr.New(svcerr.ErrInternal, err))
 	}
 
 	problems := make([]models.Problem, 0, len(mathProblems.Problems))

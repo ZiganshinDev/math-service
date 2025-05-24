@@ -2,9 +2,9 @@ package mathmaker
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"io"
+	"mathbot/internal/svcerr"
 	"net/http"
 	"strings"
 	"time"
@@ -45,16 +45,16 @@ func (m *Mathmaker) Get(ctx context.Context, url string) ([]byte, error) {
 
 	resp, err := m.client.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("%s: %w", op, err)
+		return nil, fmt.Errorf("%s: %w", op, svcerr.New(svcerr.ErrInternal, err))
 	}
 	defer resp.Body.Close()
 
 	m.logger.With("url", url).Debugf("response status: %d, headers: %v", resp.StatusCode, resp.Header)
 
-	if err := checkStatusCode(resp.StatusCode); err != nil {
+	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(resp.Body)
 		m.logger.Debugf("response body: %s", body)
-		return nil, fmt.Errorf("%s: %w", op, err)
+		return nil, nil
 	}
 
 	contentType := resp.Header.Get("Content-Type")
@@ -64,20 +64,9 @@ func (m *Mathmaker) Get(ctx context.Context, url string) ([]byte, error) {
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return nil, fmt.Errorf("%s: %w", op, err)
+		return nil, fmt.Errorf("%s: %w", op, svcerr.New(svcerr.ErrInternal, err))
 	}
 
 	m.logger.Debugf("response body length: %d bytes", len(body))
 	return body, nil
-}
-
-func checkStatusCode(code int) error {
-	const op = "mathmaker.mathmaker.checkStatusCode"
-
-	switch code {
-	case http.StatusNotFound:
-		return fmt.Errorf("%s: %w", op, errors.New("not found"))
-	}
-
-	return nil
 }

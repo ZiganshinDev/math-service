@@ -2,12 +2,16 @@ package app
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"mathbot/internal/models"
+	"mathbot/internal/svcerr"
 
 	"github.com/google/uuid"
 )
+
+var ErrProblemNotFound = errors.New("problem not found")
 
 func (a *App) Problem(ctx context.Context, id uuid.UUID) (models.Problem, error) {
 	const op = "app.problems.Problem"
@@ -15,6 +19,11 @@ func (a *App) Problem(ctx context.Context, id uuid.UUID) (models.Problem, error)
 	problem, err := a.pb.Problem(ctx, id)
 	if err != nil {
 		return models.Problem{}, fmt.Errorf("%s: %w", op, err)
+	}
+
+	if problem.ID == uuid.Nil {
+		return models.Problem{}, fmt.Errorf("%s: %w", op, svcerr.New(svcerr.ErrNotFound, ErrProblemNotFound,
+			fmt.Sprintf("id: %s", id)))
 	}
 
 	return problem, nil
