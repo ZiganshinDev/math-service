@@ -16,5 +16,5 @@ services:
 
 networks:
   default:
-    name: tat-network
+    name: local-network
     external: true
